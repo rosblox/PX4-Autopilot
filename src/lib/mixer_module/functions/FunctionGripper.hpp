@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2021 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2022 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,36 +33,37 @@
 
 #pragma once
 
-#include "ActuatorEffectiveness.hpp"
-#include "ActuatorEffectivenessRotors.hpp"
-#include "ActuatorEffectivenessTilts.hpp"
+#include "FunctionProviderBase.hpp"
 
-class ActuatorEffectivenessMCTilt : public ModuleParams, public ActuatorEffectiveness
+#include <uORB/topics/gripper.h>
+
+/**
+ * @brief Function: Gripper (Used for actuating a Gripper)
+ */
+class FunctionGripper : public FunctionProviderBase
 {
 public:
-	ActuatorEffectivenessMCTilt(ModuleParams *parent);
-	virtual ~ActuatorEffectivenessMCTilt() = default;
+	FunctionGripper() = default;
+	static FunctionProviderBase *allocate(const Context &context) { return new FunctionGripper(); }
 
-	bool getEffectivenessMatrix(Configuration &configuration, EffectivenessUpdateReason external_update) override;
-
-	void getDesiredAllocationMethod(AllocationMethod allocation_method_out[MAX_NUM_MATRICES]) const override
+	void update() override
 	{
-		allocation_method_out[0] = AllocationMethod::SEQUENTIAL_DESATURATION;
+		gripper_s gripper;
+
+		if (_gripper_sub.update(&gripper)) {
+			if (gripper.command == gripper_s::COMMAND_RELEASE) {
+				_data = -1.f; // Minimum command for release
+
+			} else if (gripper.command == gripper_s::COMMAND_GRAB) {
+				_data = 1.f; // Maximum command for grab
+
+			}
+		}
 	}
 
-	void getNormalizeRPY(bool normalize[MAX_NUM_MATRICES]) const override
-	{
-		normalize[0] = true;
-	}
+	float value(OutputFunction func) override { return _data; }
 
-	void updateSetpoint(const matrix::Vector<float, NUM_AXES> &control_sp, int matrix_index,
-			    ActuatorVector &actuator_sp, const matrix::Vector<float, NUM_ACTUATORS> &actuator_min,
-			    const matrix::Vector<float, NUM_ACTUATORS> &actuator_max) override;
-
-	const char *name() const override { return "MC Tilt"; }
-
-protected:
-	ActuatorVector _tilt_offsets;
-	ActuatorEffectivenessRotors _mc_rotors;
-	ActuatorEffectivenessTilts _tilts;
+private:
+	uORB::Subscription _gripper_sub{ORB_ID(gripper)};
+	float _data{-1.f};
 };

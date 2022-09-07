@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2019 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2022 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,44 +30,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
-
-px4_add_library(ActuatorEffectiveness
-	ActuatorEffectiveness.cpp
-	ActuatorEffectiveness.hpp
-	ActuatorEffectivenessControlSurfaces.cpp
-	ActuatorEffectivenessControlSurfaces.hpp
-	ActuatorEffectivenessCustom.cpp
-	ActuatorEffectivenessCustom.hpp
-	ActuatorEffectivenessFixedWing.cpp
-	ActuatorEffectivenessFixedWing.hpp
-	ActuatorEffectivenessHelicopter.cpp
-	ActuatorEffectivenessHelicopter.hpp
-	ActuatorEffectivenessMCTilt.cpp
-	ActuatorEffectivenessMCTilt.hpp
-	ActuatorEffectivenessMultirotor.cpp
-	ActuatorEffectivenessMultirotor.hpp
-	ActuatorEffectivenessTilts.cpp
-	ActuatorEffectivenessTilts.hpp
-	ActuatorEffectivenessRotors.cpp
-	ActuatorEffectivenessRotors.hpp
-	ActuatorEffectivenessStandardVTOL.cpp
-	ActuatorEffectivenessStandardVTOL.hpp
-	ActuatorEffectivenessTiltrotorVTOL.cpp
-	ActuatorEffectivenessTiltrotorVTOL.hpp
-	ActuatorEffectivenessTailsitterVTOL.cpp
-	ActuatorEffectivenessTailsitterVTOL.hpp
-	ActuatorEffectivenessRoverAckermann.hpp
-	ActuatorEffectivenessRoverAckermann.cpp
-	ActuatorEffectivenessRoverDifferential.hpp
-	ActuatorEffectivenessRoverDifferential.cpp
-)
-
-target_compile_options(ActuatorEffectiveness PRIVATE ${MAX_CUSTOM_OPT_LEVEL})
-target_include_directories(ActuatorEffectiveness PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(ActuatorEffectiveness
-	PRIVATE
-		mathlib
-)
-
-px4_add_functional_gtest(SRC ActuatorEffectivenessHelicopterTest.cpp LINKLIBS ActuatorEffectiveness)
-px4_add_functional_gtest(SRC ActuatorEffectivenessRotorsTest.cpp LINKLIBS ActuatorEffectiveness)
+px4_add_module(
+	MODULE modules__payload_deliverer
+	MAIN payload_deliverer
+	SRCS
+		payload_deliverer.cpp
+		gripper.cpp
+	MODULE_CONFIG
+		module.yaml
+	COMPILE_FLAGS
+		#-DDEBUG_BUILD
+	DEPENDS
+		px4_work_queue
+	)
