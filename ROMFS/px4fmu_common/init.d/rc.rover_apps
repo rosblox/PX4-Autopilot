@@ -8,6 +8,7 @@
 #
 # Start the attitude and position estimator.
 #
+
 ekf2 start &
 #attitude_estimator_q start
 #local_position_estimator start
@@ -23,7 +24,14 @@ fi
 #
 # Start attitude controllers.
 #
-rover_pos_control start
+
+
+# rover_pos_control start   <--- sort of works with current offboard example code.
+
+# airship_att_control start <-- doesn't do anything
+# uuv_att_control makes it jitter hard
+
+# mc_rate_control / mc_att_control <--- ??? doesnt do anythin
 
 
 #

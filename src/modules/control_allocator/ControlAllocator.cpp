@@ -668,7 +668,7 @@ ControlAllocator::publish_actuator_controls()
 		actuator_motors.control[i] = NAN;
 	}
 
-	_actuator_motors_pub.publish(actuator_motors);
+	// _actuator_motors_pub.publish(actuator_motors);
 
 	// servos
 	if (_num_actuators[1] > 0) {
